@@ -6,6 +6,7 @@
 - [x] Domain model: products, equivalences, locker, trips, wiki, avoid rules
 - [x] Seed: Allegra / fexofenadine US → DE / EE
 - [x] Mobile-first PWA shell with i18n hooks
+- [x] Trip conversion report with shopping list, bought/notes, HTML export
 - [x] Podman + Caddy deployment on ports 16125–16127
 - [ ] User authentication
 - [ ] Photo upload pipeline
@@ -14,9 +15,11 @@
 
 - [ ] OCR + LLM locker/diet scan (Tesseract / cloud vision)
 - [ ] openFDA, RxNorm, EMA-style ingredient crosswalk
+- [ ] Locale router for destination data (see `docs/DATA_SOURCES.md`)
 - [ ] Geolocation → nearest pharmacy / retailer hints
 - [ ] Price aggregation (where legally available)
-- [ ] PDF + HTML trip report with origin ↔ foreign photos
+- [x] HTML trip report with origin ↔ foreign products
+- [ ] PDF export (use browser print from HTML for now)
 
 ## Phase 3 — SaaS & scale
 

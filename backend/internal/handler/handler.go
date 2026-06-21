@@ -49,7 +49,9 @@ func (h *Handler) Router() http.Handler {
 		r.Post("/locker", h.createLockerItem)
 		r.Post("/locker/scan", h.scanLocker)
 		r.Post("/trips", h.createTrip)
+		r.Get("/trips/{id}", h.getTrip)
 		r.Post("/trips/{id}/convert", h.convertTrip)
+		r.Patch("/trips/{id}/items/{itemId}", h.updateLineItem)
 		r.Get("/trips/{id}/export", h.exportTrip)
 		r.Get("/wiki", h.listWiki)
 	})
@@ -156,6 +158,20 @@ func (h *Handler) createTrip(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, created)
 }
 
+func (h *Handler) getTrip(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid trip id")
+		return
+	}
+	report, err := h.svc.GetTripReport(r.Context(), id, service.ParseDemoUserID())
+	if err != nil {
+		writeServiceError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, report)
+}
+
 func (h *Handler) convertTrip(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -167,19 +183,39 @@ func (h *Handler) convertTrip(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.svc.ConvertTrip(r.Context(), id, service.ParseDemoUserID(), req)
 	if err != nil {
-		var se *service.ServiceError
-		if errors.As(err, &se) && se.Code == "forbidden" {
-			writeError(w, http.StatusForbidden, se.Message)
-			return
-		}
-		writeError(w, http.StatusInternalServerError, err.Error())
+		writeServiceError(w, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, resp)
 }
 
+func (h *Handler) updateLineItem(w http.ResponseWriter, r *http.Request) {
+	tripID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid trip id")
+		return
+	}
+	itemID, err := uuid.Parse(chi.URLParam(r, "itemId"))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid item id")
+		return
+	}
+	var req domain.UpdateLineItemRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+
+	report, err := h.svc.UpdateLineItem(r.Context(), tripID, itemID, service.ParseDemoUserID(), req)
+	if err != nil {
+		writeServiceError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, report)
+}
+
 func (h *Handler) exportTrip(w http.ResponseWriter, r *http.Request) {
-	_, err := uuid.Parse(chi.URLParam(r, "id"))
+	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "invalid trip id")
 		return
@@ -189,13 +225,21 @@ func (h *Handler) exportTrip(w http.ResponseWriter, r *http.Request) {
 		format = "html"
 	}
 
-	if format == "html" {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_, _ = w.Write([]byte(`<!DOCTYPE html><html><head><title>EquiDrug Trip Report</title></head>
-<body><h1>Trip export</h1><p>Full PDF/HTML export ships with trip conversion data in the next iteration.</p></body></html>`))
+	report, err := h.svc.GetTripReport(r.Context(), id, service.ParseDemoUserID())
+	if err != nil {
+		writeServiceError(w, err)
 		return
 	}
-	writeError(w, http.StatusNotImplemented, "pdf export coming soon")
+
+	switch format {
+	case "html":
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = w.Write([]byte(service.RenderTripHTML(report)))
+	case "json":
+		writeJSON(w, http.StatusOK, report)
+	default:
+		writeError(w, http.StatusBadRequest, "format must be html or json")
+	}
 }
 
 func (h *Handler) listWiki(w http.ResponseWriter, r *http.Request) {
@@ -208,6 +252,22 @@ func (h *Handler) listWiki(w http.ResponseWriter, r *http.Request) {
 		entries = []domain.LookupMatch{}
 	}
 	writeJSON(w, http.StatusOK, entries)
+}
+
+func writeServiceError(w http.ResponseWriter, err error) {
+	var se *service.ServiceError
+	if errors.As(err, &se) {
+		switch se.Code {
+		case "forbidden":
+			writeError(w, http.StatusForbidden, se.Message)
+		case "not_found":
+			writeError(w, http.StatusNotFound, se.Message)
+		default:
+			writeError(w, http.StatusInternalServerError, se.Message)
+		}
+		return
+	}
+	writeError(w, http.StatusInternalServerError, err.Error())
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {

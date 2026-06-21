@@ -45,28 +45,39 @@ func (s *Service) CreateTrip(ctx context.Context, trip domain.TripPlan) (domain.
 	return s.repo.CreateTrip(ctx, trip)
 }
 
-func (s *Service) ConvertTrip(ctx context.Context, tripID uuid.UUID, userID uuid.UUID, req domain.ConvertTripRequest) (domain.ConvertTripResponse, error) {
+func (s *Service) GetTripReport(ctx context.Context, tripID, userID uuid.UUID) (domain.TripReport, error) {
 	trip, err := s.repo.GetTrip(ctx, tripID)
 	if err != nil {
-		return domain.ConvertTripResponse{}, err
+		return domain.TripReport{}, err
 	}
 	if trip.UserID != userID {
-		return domain.ConvertTripResponse{}, ErrForbidden
+		return domain.TripReport{}, ErrForbidden
+	}
+	return s.buildReportFromTrip(ctx, trip)
+}
+
+func (s *Service) ConvertTrip(ctx context.Context, tripID uuid.UUID, userID uuid.UUID, req domain.ConvertTripRequest) (domain.TripReport, error) {
+	trip, err := s.repo.GetTrip(ctx, tripID)
+	if err != nil {
+		return domain.TripReport{}, err
+	}
+	if trip.UserID != userID {
+		return domain.TripReport{}, ErrForbidden
 	}
 
-	days := int(math.Ceil(trip.EndDate.Sub(trip.StartDate).Hours() / 24))
-	if days < 1 {
-		days = 1
+	if len(req.PreferredBrands) > 0 {
+		trip.PreferredBrands = req.PreferredBrands
 	}
+
+	days := calcTripDays(trip.StartDate, trip.EndDate)
 	multiplier := 1 + trip.SparePercent/100
 
 	locker, err := s.repo.ListLockerItems(ctx, userID)
 	if err != nil {
-		return domain.ConvertTripResponse{}, err
+		return domain.TripReport{}, err
 	}
 
-	var lineItems []domain.TripLineItem
-	var products []domain.Product
+	_ = s.repo.DeleteTripLineItems(ctx, tripID)
 
 	for _, item := range locker {
 		qty := item.DosePerDay * float64(days) * multiplier
@@ -78,30 +89,105 @@ func (s *Service) ConvertTrip(ctx context.Context, tripID uuid.UUID, userID uuid
 			QuantityUnit:   item.DoseUnit,
 		}
 
-		if item.ProductID != uuid.Nil {
-			line.OriginProductID = item.ProductID
-			matches, err := s.repo.FindEquivalentsByOrigin(ctx, item.ProductID, trip.DestCountry)
+		originID := item.ProductID
+		if originID == uuid.Nil {
+			if p, err := s.repo.FindProductByName(ctx, item.CustomName, trip.OriginCountry); err == nil {
+				originID = p.ID
+			}
+		}
+		if originID != uuid.Nil {
+			line.OriginProductID = originID
+			matches, err := s.repo.FindEquivalentsByOrigin(ctx, originID, trip.DestCountry)
 			if err == nil && len(matches) > 0 {
 				best := matches[0]
 				line.ForeignProductID = best.Product.ID
 				line.EstimatedPrice = best.Product.PriceHint
 				line.WhereToBuy = best.Product.RetailerHint
-				products = append(products, best.Product)
-				_ = s.repo.SaveWikiEntry(ctx, userID, item.ProductID, best.Product.ID, best.Equivalence.Confidence, "")
+				_ = s.repo.SaveWikiEntry(ctx, userID, originID, best.Product.ID, best.Equivalence.Confidence, best.Equivalence.Notes)
 			}
 		}
 
 		if err := s.repo.UpsertTripLineItem(ctx, line); err != nil {
-			return domain.ConvertTripResponse{}, err
+			return domain.TripReport{}, err
 		}
-		lineItems = append(lineItems, line)
 	}
 
+	_ = s.repo.UpdateTripStatus(ctx, tripID, "converted")
 	trip.Status = "converted"
-	return domain.ConvertTripResponse{
-		Trip:      trip,
-		LineItems: lineItems,
-		Products:  products,
+	return s.buildReportFromTrip(ctx, trip)
+}
+
+func (s *Service) UpdateLineItem(ctx context.Context, tripID, itemID, userID uuid.UUID, req domain.UpdateLineItemRequest) (domain.TripReport, error) {
+	trip, err := s.repo.GetTrip(ctx, tripID)
+	if err != nil {
+		return domain.TripReport{}, err
+	}
+	if trip.UserID != userID {
+		return domain.TripReport{}, ErrForbidden
+	}
+	if _, err := s.repo.UpdateTripLineItem(ctx, tripID, itemID, req.Bought, req.Notes); err != nil {
+		return domain.TripReport{}, err
+	}
+	return s.buildReportFromTrip(ctx, trip)
+}
+
+func (s *Service) buildReportFromTrip(ctx context.Context, trip domain.TripPlan) (domain.TripReport, error) {
+	lineItems, err := s.repo.ListTripLineItems(ctx, trip.ID)
+	if err != nil {
+		return domain.TripReport{}, err
+	}
+
+	summary := domain.TripReportSummary{
+		TotalItems: len(lineItems),
+		TripDays:   calcTripDays(trip.StartDate, trip.EndDate),
+	}
+	var rows []domain.TripReportRow
+
+	for _, line := range lineItems {
+		lockerItem, _ := s.repo.GetLockerItem(ctx, line.LockerItemID)
+		row := domain.TripReportRow{
+			LineItem:   line,
+			LockerItem: lockerItem,
+		}
+
+		if line.OriginProductID != uuid.Nil {
+			if p, err := s.repo.GetProduct(ctx, line.OriginProductID); err == nil {
+				row.Origin = &p
+			}
+		}
+		if line.ForeignProductID != uuid.Nil {
+			if p, err := s.repo.GetProduct(ctx, line.ForeignProductID); err == nil {
+				row.Foreign = &p
+			}
+			if row.Origin != nil {
+				matches, _ := s.repo.FindEquivalentsByOrigin(ctx, line.OriginProductID, trip.DestCountry)
+				for _, m := range matches {
+					if m.Product.ID == line.ForeignProductID {
+						row.Confidence = m.Equivalence.Confidence
+						row.MatchNotes = m.Equivalence.Notes
+						break
+					}
+				}
+			}
+			row.MatchStatus = "matched"
+			summary.MatchedItems++
+		} else {
+			row.MatchStatus = "unmatched"
+			row.MatchNotes = "No curated equivalent yet — try on-the-go lookup at destination"
+			summary.UnmatchedItems++
+		}
+
+		if line.Bought {
+			summary.BoughtItems++
+		}
+		rows = append(rows, row)
+	}
+
+	return domain.TripReport{
+		Trip:       trip,
+		Summary:    summary,
+		Rows:       rows,
+		Disclaimer: disclaimer,
 	}, nil
 }
 
@@ -109,7 +195,6 @@ func (s *Service) ListWiki(ctx context.Context, userID uuid.UUID) ([]domain.Look
 	return s.repo.ListWikiEntries(ctx, userID)
 }
 
-// ScanLocker is a stub for OCR+AI pipeline (phase 2).
 func (s *Service) ScanLocker(_ context.Context, _ uuid.UUID, _ string) ([]domain.LockerItem, error) {
 	return nil, ErrNotImplemented
 }
@@ -117,6 +202,7 @@ func (s *Service) ScanLocker(_ context.Context, _ uuid.UUID, _ string) ([]domain
 var (
 	ErrForbidden      = &ServiceError{Code: "forbidden", Message: "access denied"}
 	ErrNotImplemented = &ServiceError{Code: "not_implemented", Message: "feature coming soon"}
+	ErrNotFound       = &ServiceError{Code: "not_found", Message: "not found"}
 )
 
 type ServiceError struct {
@@ -127,11 +213,10 @@ type ServiceError struct {
 func (e *ServiceError) Error() string { return e.Message }
 
 func ParseDemoUserID() uuid.UUID {
-	// Demo user until auth is wired
 	return uuid.MustParse("00000000-0000-0000-0000-000000000001")
 }
 
-func TripDays(start, end time.Time) int {
+func calcTripDays(start, end time.Time) int {
 	d := int(math.Ceil(end.Sub(start).Hours() / 24))
 	if d < 1 {
 		return 1
