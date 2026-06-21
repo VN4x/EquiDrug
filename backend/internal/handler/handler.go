@@ -54,6 +54,12 @@ func (h *Handler) Router() http.Handler {
 		r.Patch("/trips/{id}/items/{itemId}", h.updateLineItem)
 		r.Get("/trips/{id}/export", h.exportTrip)
 		r.Get("/wiki", h.listWiki)
+		r.Get("/diet/profile", h.getDietProfile)
+		r.Put("/diet/profile", h.updateDietProfile)
+		r.Get("/diet/today", h.getDietToday)
+		r.Post("/diet/analyze", h.analyzeFood)
+		r.Post("/diet/log", h.logFood)
+		r.Delete("/diet/log/{id}", h.deleteFoodLog)
 	})
 
 	return r
@@ -252,6 +258,90 @@ func (h *Handler) listWiki(w http.ResponseWriter, r *http.Request) {
 		entries = []domain.LookupMatch{}
 	}
 	writeJSON(w, http.StatusOK, entries)
+}
+
+func (h *Handler) getDietProfile(w http.ResponseWriter, r *http.Request) {
+	p, err := h.svc.GetMacroProfile(r.Context(), service.ParseDemoUserID())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, p)
+}
+
+func (h *Handler) updateDietProfile(w http.ResponseWriter, r *http.Request) {
+	var req domain.UpdateMacroProfileRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	p, err := h.svc.UpdateMacroProfile(r.Context(), service.ParseDemoUserID(), req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, p)
+}
+
+func (h *Handler) getDietToday(w http.ResponseWriter, r *http.Request) {
+	date := r.URL.Query().Get("date")
+	summary, err := h.svc.GetDietDay(r.Context(), service.ParseDemoUserID(), date)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, summary)
+}
+
+func (h *Handler) analyzeFood(w http.ResponseWriter, r *http.Request) {
+	var req domain.AnalyzeFoodRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	if req.Query == "" && req.MenuText == "" && req.ImageURL == "" {
+		writeError(w, http.StatusBadRequest, "query, menu_text, or image required")
+		return
+	}
+	resp, err := h.svc.AnalyzeFood(r.Context(), req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, resp)
+}
+
+func (h *Handler) logFood(w http.ResponseWriter, r *http.Request) {
+	var req domain.LogFoodRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	if req.FoodName == "" {
+		writeError(w, http.StatusBadRequest, "food_name required")
+		return
+	}
+	summary, err := h.svc.LogFood(r.Context(), service.ParseDemoUserID(), req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusCreated, summary)
+}
+
+func (h *Handler) deleteFoodLog(w http.ResponseWriter, r *http.Request) {
+	id, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid id")
+		return
+	}
+	date := r.URL.Query().Get("date")
+	summary, err := h.svc.DeleteFoodLog(r.Context(), service.ParseDemoUserID(), id, date)
+	if err != nil {
+		writeServiceError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, summary)
 }
 
 func writeServiceError(w http.ResponseWriter, err error) {

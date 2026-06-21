@@ -7,6 +7,7 @@
 - [x] Seed: Allegra / fexofenadine US → DE / EE
 - [x] Mobile-first PWA shell with i18n hooks
 - [x] Trip conversion report with shopping list, bought/notes, HTML export
+- [x] Diet page: macro targets, food analyze/log, daily progress
 - [x] Podman + Caddy deployment on ports 16125–16127
 - [ ] User authentication
 - [ ] Photo upload pipeline

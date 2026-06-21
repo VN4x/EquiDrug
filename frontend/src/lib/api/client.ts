@@ -172,6 +172,100 @@ export function listWiki() {
 	return api<LookupMatch[]>('/api/v1/wiki');
 }
 
+export interface MacroProfile {
+	protein_g: number;
+	carbs_g: number;
+	fat_g: number;
+	calories_kcal?: number;
+	notes?: string;
+}
+
+export interface FoodReference {
+	id: string;
+	name: string;
+	name_local?: string;
+	serving_label: string;
+	protein_g: number;
+	carbs_g: number;
+	fat_g: number;
+	calories_kcal?: number;
+	country_code?: string;
+}
+
+export interface FoodLogEntry {
+	id: string;
+	food_name: string;
+	serving_label?: string;
+	protein_g: number;
+	carbs_g: number;
+	fat_g: number;
+	calories_kcal?: number;
+	confidence: number;
+	notes?: string;
+}
+
+export interface DietDaySummary {
+	date: string;
+	profile: MacroProfile;
+	consumed: { protein_g: number; carbs_g: number; fat_g: number; calories_kcal: number };
+	remaining: { protein_g: number; carbs_g: number; fat_g: number };
+	entries: FoodLogEntry[];
+}
+
+export interface AnalyzeFoodResponse {
+	query: string;
+	matches: { reference: FoodReference; confidence: number; match_reason: string }[];
+	suggested?: FoodReference;
+	vision_note?: string;
+	disclaimer: string;
+}
+
+export function getDietToday(date?: string) {
+	const q = date ? `?date=${date}` : '';
+	return api<DietDaySummary>(`/api/v1/diet/today${q}`);
+}
+
+export function updateDietProfile(profile: MacroProfile) {
+	return api<MacroProfile>('/api/v1/diet/profile', {
+		method: 'PUT',
+		body: JSON.stringify(profile)
+	});
+}
+
+export function analyzeFood(body: {
+	query?: string;
+	menu_text?: string;
+	image_url?: string;
+	country_code?: string;
+}) {
+	return api<AnalyzeFoodResponse>('/api/v1/diet/analyze', {
+		method: 'POST',
+		body: JSON.stringify(body)
+	});
+}
+
+export function logFood(entry: {
+	food_name: string;
+	serving_label?: string;
+	protein_g: number;
+	carbs_g: number;
+	fat_g: number;
+	calories_kcal?: number;
+	confidence?: number;
+	source?: string;
+	notes?: string;
+}) {
+	return api<DietDaySummary>('/api/v1/diet/log', {
+		method: 'POST',
+		body: JSON.stringify(entry)
+	});
+}
+
+export function deleteFoodLog(id: string, date?: string) {
+	const q = date ? `?date=${date}` : '';
+	return api<DietDaySummary>(`/api/v1/diet/log/${id}${q}`, { method: 'DELETE' });
+}
+
 export const countries = [
 	{ code: 'US', name: 'United States' },
 	{ code: 'DE', name: 'Germany' },

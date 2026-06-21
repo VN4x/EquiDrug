@@ -201,8 +201,15 @@ a {
 	background: var(--color-surface);
 	border-top: 1px solid var(--color-border);
 	display: grid;
-	grid-template-columns: repeat(5, 1fr);
+	grid-template-columns: repeat(6, 1fr);
 	z-index: 100;
+}
+
+.bottom-nav a span:not(.icon) {
+	max-width: 4.2rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .bottom-nav a {

@@ -11,6 +11,7 @@ Travel-first SaaS that helps you buy equivalent products abroad when you cannot 
 | **On-the-go lookup** | Enter name, URL, or photo → get local equivalents near you |
 | **Locker** | OCR+AI scan of your medicine cabinet / supplement shelf (stub) |
 | **Trip planner** | Duration + destination → quantities with 5% spare, shopping report |
+| **Diet** | Daily macros (e.g. 130P/80C/25F) — photo, menu, or dish name → log & track |
 | **Avoid** | Allergen and diet naming traps across countries |
 | **My Wiki** | Personal dictionary of *your stuff in other countries* |
 

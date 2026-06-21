@@ -167,3 +167,111 @@ type AvoidRule struct {
 	Severity      string    `json:"severity"`
 	Notes         string    `json:"notes,omitempty"`
 }
+
+type MacroProfile struct {
+	UserID       uuid.UUID `json:"user_id"`
+	ProteinG     float64   `json:"protein_g"`
+	CarbsG       float64   `json:"carbs_g"`
+	FatG         float64   `json:"fat_g"`
+	CaloriesKcal float64   `json:"calories_kcal,omitempty"`
+	Notes        string    `json:"notes,omitempty"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type FoodReference struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	NameLocal    string    `json:"name_local,omitempty"`
+	Locale       string    `json:"locale,omitempty"`
+	CountryCode  string    `json:"country_code,omitempty"`
+	ServingLabel string    `json:"serving_label"`
+	ProteinG     float64   `json:"protein_g"`
+	CarbsG       float64   `json:"carbs_g"`
+	FatG         float64   `json:"fat_g"`
+	CaloriesKcal float64   `json:"calories_kcal,omitempty"`
+	Tags         []string  `json:"tags,omitempty"`
+	Source       string    `json:"source"`
+}
+
+type FoodLogEntry struct {
+	ID           uuid.UUID `json:"id"`
+	UserID       uuid.UUID `json:"user_id"`
+	LoggedOn     string    `json:"logged_on"`
+	FoodName     string    `json:"food_name"`
+	ServingLabel string    `json:"serving_label,omitempty"`
+	ProteinG     float64   `json:"protein_g"`
+	CarbsG       float64   `json:"carbs_g"`
+	FatG         float64   `json:"fat_g"`
+	CaloriesKcal float64   `json:"calories_kcal,omitempty"`
+	Confidence   float64   `json:"confidence"`
+	Source       string    `json:"source"`
+	ImageURL     string    `json:"image_url,omitempty"`
+	Notes        string    `json:"notes,omitempty"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+type MacroTotals struct {
+	ProteinG     float64 `json:"protein_g"`
+	CarbsG       float64 `json:"carbs_g"`
+	FatG         float64 `json:"fat_g"`
+	CaloriesKcal float64 `json:"calories_kcal"`
+}
+
+type MacroRemaining struct {
+	ProteinG float64 `json:"protein_g"`
+	CarbsG   float64 `json:"carbs_g"`
+	FatG     float64 `json:"fat_g"`
+}
+
+type DietDaySummary struct {
+	Date      string         `json:"date"`
+	Profile   MacroProfile   `json:"profile"`
+	Consumed  MacroTotals    `json:"consumed"`
+	Remaining MacroRemaining `json:"remaining"`
+	Entries   []FoodLogEntry `json:"entries"`
+}
+
+type AnalyzeFoodRequest struct {
+	Query       string `json:"query"`
+	MenuText    string `json:"menu_text,omitempty"`
+	ImageURL    string `json:"image_url,omitempty"`
+	CountryCode string `json:"country_code,omitempty"`
+	Locale      string `json:"locale,omitempty"`
+}
+
+type AnalyzeFoodMatch struct {
+	Reference   FoodReference `json:"reference"`
+	Confidence  float64       `json:"confidence"`
+	MatchReason string        `json:"match_reason"`
+}
+
+type AnalyzeFoodResponse struct {
+	Query       string             `json:"query"`
+	Matches     []AnalyzeFoodMatch `json:"matches"`
+	Suggested   *FoodReference     `json:"suggested,omitempty"`
+	VisionNote  string             `json:"vision_note,omitempty"`
+	Disclaimer  string             `json:"disclaimer"`
+}
+
+type LogFoodRequest struct {
+	FoodName     string  `json:"food_name"`
+	ServingLabel string  `json:"serving_label,omitempty"`
+	ProteinG     float64 `json:"protein_g"`
+	CarbsG       float64 `json:"carbs_g"`
+	FatG         float64 `json:"fat_g"`
+	CaloriesKcal float64 `json:"calories_kcal,omitempty"`
+	Confidence   float64 `json:"confidence,omitempty"`
+	Source       string  `json:"source,omitempty"`
+	ImageURL     string  `json:"image_url,omitempty"`
+	Notes        string  `json:"notes,omitempty"`
+	LoggedOn     string  `json:"logged_on,omitempty"`
+}
+
+type UpdateMacroProfileRequest struct {
+	ProteinG     float64 `json:"protein_g"`
+	CarbsG       float64 `json:"carbs_g"`
+	FatG         float64 `json:"fat_g"`
+	CaloriesKcal float64 `json:"calories_kcal,omitempty"`
+	Notes        string  `json:"notes,omitempty"`
+}
+

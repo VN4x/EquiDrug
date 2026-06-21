@@ -9,6 +9,7 @@
 
 	const navItems = [
 		{ href: '/', icon: '🔍', key: 'nav.lookup' },
+		{ href: '/diet', icon: '🥗', key: 'nav.diet' },
 		{ href: '/locker', icon: '💊', key: 'nav.locker' },
 		{ href: '/planner', icon: '✈️', key: 'nav.planner' },
 		{ href: '/wiki', icon: '📖', key: 'nav.wiki' },

@@ -16,6 +16,8 @@ services:
       - ../backend/migrations/001_initial.sql:/docker-entrypoint-initdb.d/01_initial.sql:Z
       - ../backend/migrations/002_seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:Z
       - ../backend/migrations/003_seed_locker.sql:/docker-entrypoint-initdb.d/03_seed_locker.sql:Z
+      - ../backend/migrations/004_diet_macros.sql:/docker-entrypoint-initdb.d/04_diet_macros.sql:Z
+      - ../backend/migrations/005_seed_diet.sql:/docker-entrypoint-initdb.d/05_seed_diet.sql:Z
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U equidrug"]
       interval: 5s
