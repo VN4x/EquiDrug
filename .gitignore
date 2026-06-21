@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build
+frontend/build/
+frontend/.svelte-kit/
+backend/bin/
+*.exe
+*.test
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+deploy/.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs & temp
+*.log
+tmp/
+uploads/
+
+# Capacitor
+frontend/ios/
+frontend/android/
