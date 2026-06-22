@@ -60,6 +60,8 @@ func (h *Handler) Router() http.Handler {
 		r.Post("/diet/analyze", h.analyzeFood)
 		r.Post("/diet/log", h.logFood)
 		r.Delete("/diet/log/{id}", h.deleteFoodLog)
+		r.Get("/sources", h.listDestinationSources)
+		r.Get("/sources/countries", h.listSourceCountries)
 	})
 
 	return r

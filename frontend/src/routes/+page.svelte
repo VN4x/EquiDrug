@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
+	import DestinationSources from '$lib/components/DestinationSources.svelte';
 	import { lookup, countries, type LookupResponse } from '$lib/api/client';
 
 	let query = $state('Allegra');
@@ -46,6 +47,8 @@
 			{/each}
 		</select>
 	</div>
+
+	<DestinationSources countryCode={countryCode} category="drug" compact />
 
 	<div class="field">
 		<label for="city">{t($locale, 'lookup.city')}</label>

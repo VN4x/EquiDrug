@@ -14,6 +14,7 @@ Travel-first SaaS that helps you buy equivalent products abroad when you cannot 
 | **Diet** | Daily macros (e.g. 130P/80C/25F) — photo, menu, or dish name → log & track |
 | **Avoid** | Allergen and diet naming traps across countries |
 | **My Wiki** | Personal dictionary of *your stuff in other countries* |
+| **Sources** | Worldwide “where to look” catalog per country (local first, Google last) |
 
 ## Stack
 

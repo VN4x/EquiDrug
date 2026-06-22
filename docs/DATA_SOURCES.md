@@ -127,6 +127,10 @@ Example rows:
 | **Later** | Lens/API visual confirm, geofenced “near me” via OSM + local chains |
 | **Ongoing** | User wiki from trip shopping lists (your new report feature feeds this) |
 
+See the full worldwide reference: [DESTINATION_SOURCES.md](./DESTINATION_SOURCES.md)  
+Machine-readable catalog: `backend/internal/sources/data/destination_sources.json`  
+API: `GET /api/v1/sources?country=VN&category=drug`
+
 ## Bottom line
 
 **Google should not be step one globally.** EquiDrug should:

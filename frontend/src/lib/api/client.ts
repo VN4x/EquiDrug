@@ -266,6 +266,44 @@ export function deleteFoodLog(id: string, date?: string) {
 	return api<DietDaySummary>(`/api/v1/diet/log/${id}${q}`, { method: 'DELETE' });
 }
 
+export interface ResolvedSource {
+	priority: number;
+	adapter_id: string;
+	name: string;
+	type: string;
+	type_label?: string;
+	url: string;
+	categories: string[];
+	api_available: boolean;
+	google: boolean;
+	notes?: string;
+}
+
+export interface DestinationSourcesResponse {
+	country_code: string;
+	country_name: string;
+	region_code?: string;
+	region_name?: string;
+	google_tier: string;
+	category?: string;
+	sources: ResolvedSource[];
+	guidance: string;
+	catalog_version: string;
+}
+
+export function getDestinationSources(country: string, category?: string, region?: string) {
+	const params = new URLSearchParams({ country });
+	if (category) params.set('category', category);
+	if (region) params.set('region', region);
+	return api<DestinationSourcesResponse>(`/api/v1/sources?${params}`);
+}
+
+export function listSourceCountries() {
+	return api<{ countries: { code: string; name: string; google_tier: string }[] }>(
+		'/api/v1/sources/countries'
+	);
+}
+
 export const countries = [
 	{ code: 'US', name: 'United States' },
 	{ code: 'DE', name: 'Germany' },

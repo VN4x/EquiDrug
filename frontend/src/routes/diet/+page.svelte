@@ -3,6 +3,7 @@
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
 	import MacroBar from '$lib/components/MacroBar.svelte';
+	import DestinationSources from '$lib/components/DestinationSources.svelte';
 	import {
 		analyzeFood,
 		deleteFoodLog,
@@ -233,6 +234,8 @@
 			{/each}
 		</select>
 	</div>
+
+	<DestinationSources countryCode={countryCode} category="food" compact />
 
 	<button
 		class="btn btn-primary btn-block"
