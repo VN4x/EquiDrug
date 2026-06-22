@@ -1,0 +1,762 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-06-21",
+  "adapter_types": {
+    "curated": "EquiDrug equivalence database (always first)",
+    "registry": "Official drug / food regulatory database",
+    "marketplace": "E-commerce and online pharmacy",
+    "pharmacy_chain": "National pharmacy or drugstore chain lookup",
+    "search_engine": "Local web search (not Google)",
+    "maps": "Store locator / maps",
+    "nutrition": "Food macro and nutrition database",
+    "lens": "Visual product identification (Google Lens class)",
+    "wiki": "EquiDrug community + crowdsourced buys",
+    "offline_pack": "Pre-downloaded curated bundle for low-connectivity areas"
+  },
+  "adapters": {
+    "equidrug_curated": {
+      "name": "EquiDrug curated DB",
+      "type": "curated",
+      "url": "internal://equidrug/products",
+      "categories": ["drug", "supplement", "vitamin", "food"],
+      "api_available": true
+    },
+    "equidrug_wiki": {
+      "name": "EquiDrug My Wiki",
+      "type": "wiki",
+      "url": "internal://equidrug/wiki",
+      "categories": ["drug", "supplement", "vitamin", "food"],
+      "api_available": true
+    },
+    "openfda": {
+      "name": "openFDA",
+      "type": "registry",
+      "url": "https://api.fda.gov/drug/label.json",
+      "categories": ["drug"],
+      "api_available": true,
+      "notes": "US FDA structured product labels"
+    },
+    "dailymed": {
+      "name": "DailyMed (NLM)",
+      "type": "registry",
+      "url": "https://dailymed.nlm.nih.gov/",
+      "categories": ["drug"],
+      "api_available": true
+    },
+    "rxnorm": {
+      "name": "RxNorm (NLM)",
+      "type": "registry",
+      "url": "https://rxnav.nlm.nih.gov/",
+      "categories": ["drug"],
+      "api_available": true,
+      "notes": "INN / active ingredient normalization"
+    },
+    "google_shopping_us": {
+      "name": "Google Shopping",
+      "type": "marketplace",
+      "url": "https://www.google.com/search?tbm=shop",
+      "categories": ["drug", "supplement", "vitamin"],
+      "google": true
+    },
+    "walmart_us": {
+      "name": "Walmart",
+      "type": "pharmacy_chain",
+      "url": "https://www.walmart.com/",
+      "categories": ["drug", "supplement", "vitamin", "food"]
+    },
+    "cvs_us": {
+      "name": "CVS Pharmacy",
+      "type": "pharmacy_chain",
+      "url": "https://www.cvs.com/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "ema_eu": {
+      "name": "EMA medicines database",
+      "type": "registry",
+      "url": "https://www.ema.europa.eu/en/medicines",
+      "categories": ["drug"],
+      "api_available": false
+    },
+    "ema_product": {
+      "name": "EMA Product Management Service",
+      "type": "registry",
+      "url": "https://api.apollo.ema.europa.eu/",
+      "categories": ["drug"],
+      "api_available": true,
+      "notes": "EU centralized medicines; check access terms"
+    },
+    "edqm_cep": {
+      "name": "EDQM / CEP",
+      "type": "registry",
+      "url": "https://extranet.edqm.eu/",
+      "categories": ["drug"],
+      "notes": "European Pharmacopoeia certificates"
+    },
+    "boots_uk": {
+      "name": "Boots UK",
+      "type": "pharmacy_chain",
+      "url": "https://www.boots.com/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "dm_de": {
+      "name": "dm-drogerie markt",
+      "type": "pharmacy_chain",
+      "url": "https://www.dm.de/",
+      "categories": ["drug", "supplement", "vitamin", "food"]
+    },
+    "shop_apotheke_de": {
+      "name": "Shop-Apotheke",
+      "type": "marketplace",
+      "url": "https://www.shop-apotheke.com/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "benu_ee": {
+      "name": "Benu Pharmacy",
+      "type": "pharmacy_chain",
+      "url": "https://www.benu.ee/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "apotheka_ee": {
+      "name": "Apotheka",
+      "type": "pharmacy_chain",
+      "url": "https://www.apotheka.ee/",
+      "categories": ["drug", "supplement"]
+    },
+    "ravimiamet_ee": {
+      "name": "Ravimiamet (Estonian State Agency)",
+      "type": "registry",
+      "url": "https://www.ravimiamet.ee/",
+      "categories": ["drug"]
+    },
+    "pmda_jp": {
+      "name": "PMDA (Japan)",
+      "type": "registry",
+      "url": "https://www.pmda.go.jp/english/",
+      "categories": ["drug"],
+      "notes": "Package inserts; mostly Japanese"
+    },
+    "matsukiyo_jp": {
+      "name": "Matsumoto Kiyoshi",
+      "type": "pharmacy_chain",
+      "url": "https://www.matsukiyococokara-online.com/",
+      "categories": ["drug", "supplement", "vitamin", "food"]
+    },
+    "sugi_jp": {
+      "name": "Sugi Pharmacy",
+      "type": "pharmacy_chain",
+      "url": "https://www.sugi-net.jp/",
+      "categories": ["drug", "supplement"]
+    },
+    "rakuten_jp": {
+      "name": "Rakuten",
+      "type": "marketplace",
+      "url": "https://search.rakuten.co.jp/",
+      "categories": ["drug", "supplement", "vitamin", "food"]
+    },
+    "amazon_jp": {
+      "name": "Amazon.co.jp",
+      "type": "marketplace",
+      "url": "https://www.amazon.co.jp/",
+      "categories": ["supplement", "vitamin", "food"]
+    },
+    "mfds_kr": {
+      "name": "MFDS (Korea)",
+      "type": "registry",
+      "url": "https://www.mfds.go.kr/eng/",
+      "categories": ["drug"]
+    },
+    "oliveyoung_kr": {
+      "name": "Olive Young",
+      "type": "pharmacy_chain",
+      "url": "https://www.oliveyoung.co.kr/",
+      "categories": ["supplement", "vitamin", "food"]
+    },
+    "coupang_kr": {
+      "name": "Coupang",
+      "type": "marketplace",
+      "url": "https://www.coupang.com/",
+      "categories": ["drug", "supplement", "vitamin", "food"]
+    },
+    "nmpa_cn": {
+      "name": "NMPA (China)",
+      "type": "registry",
+      "url": "https://www.nmpa.gov.cn/",
+      "categories": ["drug"],
+      "notes": "Chinese labels; use with OCR"
+    },
+    "jd_cn": {
+      "name": "JD.com",
+      "type": "marketplace",
+      "url": "https://www.jd.com/",
+      "categories": ["drug", "supplement", "vitamin", "food"]
+    },
+    "taobao_cn": {
+      "name": "Taobao / Tmall",
+      "type": "marketplace",
+      "url": "https://www.taobao.com/",
+      "categories": ["supplement", "vitamin", "food"]
+    },
+    "baidu_cn": {
+      "name": "Baidu Search",
+      "type": "search_engine",
+      "url": "https://www.baidu.com/",
+      "categories": ["drug", "supplement", "food"],
+      "google": false
+    },
+    "wechat_miniprogram_cn": {
+      "name": "WeChat mini-programs (pharmacy)",
+      "type": "marketplace",
+      "url": "https://weixin.qq.com/",
+      "categories": ["drug", "supplement"],
+      "google": false,
+      "notes": "Dingdong, local pharmacy apps"
+    },
+    "offline_tibet_pack": {
+      "name": "EquiDrug Tibet offline pack",
+      "type": "offline_pack",
+      "url": "internal://equidrug/offline/CN-XZ",
+      "categories": ["drug", "supplement", "food"],
+      "notes": "Lhasa/Shigatse common OTC; no Google dependency"
+    },
+    "baidu_cn_xz": {
+      "name": "Baidu (Tibet queries)",
+      "type": "search_engine",
+      "url": "https://www.baidu.com/",
+      "categories": ["drug", "food"],
+      "google": false
+    },
+    "moh_vn": {
+      "name": "Vietnam Ministry of Health drug portal",
+      "type": "registry",
+      "url": "https://dichvucong.moh.gov.vn/",
+      "categories": ["drug"],
+      "notes": "Vietnamese language"
+    },
+    "shopee_vn": {
+      "name": "Shopee Vietnam",
+      "type": "marketplace",
+      "url": "https://shopee.vn/search",
+      "categories": ["supplement", "vitamin", "food"]
+    },
+    "lazada_vn": {
+      "name": "Lazada Vietnam",
+      "type": "marketplace",
+      "url": "https://www.lazada.vn/",
+      "categories": ["supplement", "vitamin", "food"]
+    },
+    "tiki_vn": {
+      "name": "Tiki",
+      "type": "marketplace",
+      "url": "https://tiki.vn/",
+      "categories": ["supplement", "vitamin", "food", "drug"]
+    },
+    "pharmacity_vn": {
+      "name": "Pharmacity",
+      "type": "pharmacy_chain",
+      "url": "https://www.pharmacity.vn/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "longchau_vn": {
+      "name": "Long Châu Pharmacy",
+      "type": "pharmacy_chain",
+      "url": "https://nhathuoclongchau.com.vn/",
+      "categories": ["drug", "supplement"]
+    },
+    "fda_th": {
+      "name": "Thai FDA",
+      "type": "registry",
+      "url": "https://www.fda.moph.go.th/",
+      "categories": ["drug", "food"]
+    },
+    "boots_th": {
+      "name": "Boots Thailand",
+      "type": "pharmacy_chain",
+      "url": "https://www.boots.co.th/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "shopee_th": {
+      "name": "Shopee Thailand",
+      "type": "marketplace",
+      "url": "https://shopee.co.th/",
+      "categories": ["supplement", "vitamin", "food"]
+    },
+    "lazada_th": {
+      "name": "Lazada Thailand",
+      "type": "marketplace",
+      "url": "https://www.lazada.co.th/",
+      "categories": ["supplement", "vitamin", "food"]
+    },
+    "moph_la": {
+      "name": "Lao Ministry of Health",
+      "type": "registry",
+      "url": "https://www.moh.gov.la/",
+      "categories": ["drug"],
+      "notes": "Limited online product search"
+    },
+    "equidrug_offline_la": {
+      "name": "EquiDrug Laos offline pack",
+      "type": "offline_pack",
+      "url": "internal://equidrug/offline/LA",
+      "categories": ["drug", "supplement"],
+      "notes": "Vientiane/Luang Prabang pharmacy equivalents"
+    },
+    "equidrug_wiki_la": {
+      "name": "EquiDrug community (Laos)",
+      "type": "wiki",
+      "url": "internal://equidrug/wiki?country=LA",
+      "categories": ["drug", "supplement", "food"]
+    },
+    "google_lens": {
+      "name": "Google Lens",
+      "type": "lens",
+      "url": "https://lens.google.com/",
+      "categories": ["drug", "supplement", "vitamin", "food"],
+      "google": true,
+      "notes": "Confirmation only; skip in CN/LA rural/Tibet"
+    },
+    "google_maps": {
+      "name": "Google Maps",
+      "type": "maps",
+      "url": "https://maps.google.com/",
+      "categories": ["drug", "supplement", "food"],
+      "google": true
+    },
+    "osm_overpass": {
+      "name": "OpenStreetMap (pharmacy POI)",
+      "type": "maps",
+      "url": "https://overpass-api.de/",
+      "categories": ["drug"],
+      "api_available": true,
+      "google": false,
+      "notes": "Fallback maps worldwide; tag amenity=pharmacy"
+    },
+    "openfoodfacts": {
+      "name": "Open Food Facts",
+      "type": "nutrition",
+      "url": "https://world.openfoodfacts.org/",
+      "categories": ["food"],
+      "api_available": true
+    },
+    "usda_fdc": {
+      "name": "USDA FoodData Central",
+      "type": "nutrition",
+      "url": "https://fdc.nal.usda.gov/api-guide.html",
+      "categories": ["food"],
+      "api_available": true
+    },
+    "naver_kr": {
+      "name": "Naver Shopping",
+      "type": "search_engine",
+      "url": "https://shopping.naver.com/",
+      "categories": ["supplement", "vitamin", "food"],
+      "google": false
+    },
+    "yandex_ru": {
+      "name": "Yandex",
+      "type": "search_engine",
+      "url": "https://yandex.ru/",
+      "categories": ["drug", "supplement", "food"],
+      "google": false
+    },
+    "eapteka_ru": {
+      "name": "Eapteka",
+      "type": "marketplace",
+      "url": "https://www.eapteka.ru/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "grls_ru": {
+      "name": "GRLS (Russia state register)",
+      "type": "registry",
+      "url": "https://grls.rosminzdrav.ru/",
+      "categories": ["drug"]
+    },
+    "cofepris_mx": {
+      "name": "COFEPRIS (Mexico)",
+      "type": "registry",
+      "url": "https://www.gob.mx/cofepris",
+      "categories": ["drug"]
+    },
+    "farmacias_gdl_mx": {
+      "name": "Farmacias Guadalajara / del Ahorro",
+      "type": "pharmacy_chain",
+      "url": "https://www.farmaciasguadalajara.com/",
+      "categories": ["drug", "supplement"]
+    },
+    "anvisa_br": {
+      "name": "ANVISA",
+      "type": "registry",
+      "url": "https://www.gov.br/anvisa/",
+      "categories": ["drug", "food"]
+    },
+    "drogasil_br": {
+      "name": "Drogasil / Raia",
+      "type": "pharmacy_chain",
+      "url": "https://www.drogasil.com.br/",
+      "categories": ["drug", "supplement"]
+    },
+    "tga_au": {
+      "name": "TGA (Australia)",
+      "type": "registry",
+      "url": "https://www.tga.gov.au/",
+      "categories": ["drug", "supplement"]
+    },
+    "chemist_warehouse_au": {
+      "name": "Chemist Warehouse",
+      "type": "pharmacy_chain",
+      "url": "https://www.chemistwarehouse.com.au/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "health_canada": {
+      "name": "Health Canada DPD",
+      "type": "registry",
+      "url": "https://health-products.canada.ca/dpd-bdpp/",
+      "categories": ["drug"]
+    },
+    "shoppers_ca": {
+      "name": "Shoppers Drug Mart",
+      "type": "pharmacy_chain",
+      "url": "https://www.shoppersdrugmart.ca/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "cdsco_in": {
+      "name": "CDSCO (India)",
+      "type": "registry",
+      "url": "https://cdsco.gov.in/",
+      "categories": ["drug"]
+    },
+    "1mg_in": {
+      "name": "1mg / Tata 1mg",
+      "type": "marketplace",
+      "url": "https://www.1mg.com/",
+      "categories": ["drug", "supplement", "vitamin"]
+    },
+    "pharmeasy_in": {
+      "name": "PharmEasy",
+      "type": "marketplace",
+      "url": "https://pharmeasy.in/",
+      "categories": ["drug", "supplement"]
+    },
+    "sfda_sa": {
+      "name": "SFDA (Saudi Arabia)",
+      "type": "registry",
+      "url": "https://www.sfda.gov.sa/",
+      "categories": ["drug", "food"]
+    },
+    "nahdi_sa": {
+      "name": "Al-Nahdi Pharmacy",
+      "type": "pharmacy_chain",
+      "url": "https://www.nahdi.sa/",
+      "categories": ["drug", "supplement", "vitamin"]
+    }
+  },
+  "countries": {
+    "US": {
+      "name": "United States",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "openfda", "priority": 3 },
+        { "adapter_id": "dailymed", "priority": 4 },
+        { "adapter_id": "rxnorm", "priority": 5 },
+        { "adapter_id": "walmart_us", "priority": 6 },
+        { "adapter_id": "cvs_us", "priority": 7 },
+        { "adapter_id": "google_shopping_us", "priority": 8 },
+        { "adapter_id": "usda_fdc", "priority": 9, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 10 },
+        { "adapter_id": "google_maps", "priority": 11 }
+      ]
+    },
+    "CA": {
+      "name": "Canada",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "health_canada", "priority": 3 },
+        { "adapter_id": "shoppers_ca", "priority": 4 },
+        { "adapter_id": "openfoodfacts", "priority": 5, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 8 },
+        { "adapter_id": "google_maps", "priority": 9 }
+      ]
+    },
+    "GB": {
+      "name": "United Kingdom",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "ema_eu", "priority": 3 },
+        { "adapter_id": "boots_uk", "priority": 4 },
+        { "adapter_id": "openfoodfacts", "priority": 5, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 8 },
+        { "adapter_id": "google_maps", "priority": 9 }
+      ]
+    },
+    "DE": {
+      "name": "Germany",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "ema_eu", "priority": 3 },
+        { "adapter_id": "shop_apotheke_de", "priority": 4 },
+        { "adapter_id": "dm_de", "priority": 5 },
+        { "adapter_id": "openfoodfacts", "priority": 6, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 9 },
+        { "adapter_id": "google_maps", "priority": 10 }
+      ]
+    },
+    "FR": {
+      "name": "France",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "ema_eu", "priority": 3 },
+        { "adapter_id": "openfoodfacts", "priority": 4, "categories": ["food"] },
+        { "adapter_id": "osm_overpass", "priority": 6 },
+        { "adapter_id": "google_lens", "priority": 9 },
+        { "adapter_id": "google_maps", "priority": 10 }
+      ]
+    },
+    "ES": {
+      "name": "Spain",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "ema_eu", "priority": 3 },
+        { "adapter_id": "openfoodfacts", "priority": 4, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 9 },
+        { "adapter_id": "google_maps", "priority": 10 }
+      ]
+    },
+    "EE": {
+      "name": "Estonia",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "ravimiamet_ee", "priority": 3 },
+        { "adapter_id": "benu_ee", "priority": 4 },
+        { "adapter_id": "apotheka_ee", "priority": 5 },
+        { "adapter_id": "openfoodfacts", "priority": 6, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 9 },
+        { "adapter_id": "google_maps", "priority": 10 }
+      ]
+    },
+    "RU": {
+      "name": "Russia",
+      "google_tier": "limited",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "grls_ru", "priority": 3 },
+        { "adapter_id": "eapteka_ru", "priority": 4 },
+        { "adapter_id": "yandex_ru", "priority": 5 },
+        { "adapter_id": "osm_overpass", "priority": 7 },
+        { "adapter_id": "google_lens", "priority": 12, "notes": "Often degraded; prefer Yandex" }
+      ]
+    },
+    "JP": {
+      "name": "Japan",
+      "google_tier": "secondary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "pmda_jp", "priority": 3 },
+        { "adapter_id": "matsukiyo_jp", "priority": 4 },
+        { "adapter_id": "sugi_jp", "priority": 5 },
+        { "adapter_id": "rakuten_jp", "priority": 6 },
+        { "adapter_id": "amazon_jp", "priority": 7 },
+        { "adapter_id": "openfoodfacts", "priority": 8, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 10 },
+        { "adapter_id": "google_maps", "priority": 11 }
+      ]
+    },
+    "KR": {
+      "name": "South Korea",
+      "google_tier": "secondary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "mfds_kr", "priority": 3 },
+        { "adapter_id": "oliveyoung_kr", "priority": 4 },
+        { "adapter_id": "coupang_kr", "priority": 5 },
+        { "adapter_id": "naver_kr", "priority": 6 },
+        { "adapter_id": "google_lens", "priority": 10 },
+        { "adapter_id": "google_maps", "priority": 11 }
+      ]
+    },
+    "CN": {
+      "name": "China",
+      "google_tier": "avoid",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "nmpa_cn", "priority": 3 },
+        { "adapter_id": "jd_cn", "priority": 4 },
+        { "adapter_id": "taobao_cn", "priority": 5 },
+        { "adapter_id": "baidu_cn", "priority": 6 },
+        { "adapter_id": "wechat_miniprogram_cn", "priority": 7 },
+        { "adapter_id": "osm_overpass", "priority": 8 },
+        { "adapter_id": "google_lens", "priority": 99, "notes": "Skip — use Baidu + OCR" }
+      ]
+    },
+    "VN": {
+      "name": "Vietnam",
+      "google_tier": "secondary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "moh_vn", "priority": 3 },
+        { "adapter_id": "pharmacity_vn", "priority": 4 },
+        { "adapter_id": "longchau_vn", "priority": 5 },
+        { "adapter_id": "shopee_vn", "priority": 6 },
+        { "adapter_id": "tiki_vn", "priority": 7 },
+        { "adapter_id": "lazada_vn", "priority": 8 },
+        { "adapter_id": "openfoodfacts", "priority": 9, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 12 },
+        { "adapter_id": "google_maps", "priority": 13 }
+      ]
+    },
+    "TH": {
+      "name": "Thailand",
+      "google_tier": "secondary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "fda_th", "priority": 3 },
+        { "adapter_id": "boots_th", "priority": 4 },
+        { "adapter_id": "shopee_th", "priority": 5 },
+        { "adapter_id": "lazada_th", "priority": 6 },
+        { "adapter_id": "openfoodfacts", "priority": 7, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 11 },
+        { "adapter_id": "google_maps", "priority": 12 }
+      ]
+    },
+    "LA": {
+      "name": "Laos",
+      "google_tier": "avoid",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_offline_la", "priority": 2 },
+        { "adapter_id": "equidrug_wiki_la", "priority": 3 },
+        { "adapter_id": "moph_la", "priority": 4 },
+        { "adapter_id": "osm_overpass", "priority": 5 },
+        { "adapter_id": "google_lens", "priority": 20, "notes": "Low confidence only" },
+        { "adapter_id": "google_maps", "priority": 21, "notes": "Sparse POI data" }
+      ]
+    },
+    "IN": {
+      "name": "India",
+      "google_tier": "secondary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "cdsco_in", "priority": 3 },
+        { "adapter_id": "1mg_in", "priority": 4 },
+        { "adapter_id": "pharmeasy_in", "priority": 5 },
+        { "adapter_id": "openfoodfacts", "priority": 6, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 10 },
+        { "adapter_id": "google_maps", "priority": 11 }
+      ]
+    },
+    "AU": {
+      "name": "Australia",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "tga_au", "priority": 3 },
+        { "adapter_id": "chemist_warehouse_au", "priority": 4 },
+        { "adapter_id": "openfoodfacts", "priority": 5, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 8 },
+        { "adapter_id": "google_maps", "priority": 9 }
+      ]
+    },
+    "MX": {
+      "name": "Mexico",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "cofepris_mx", "priority": 3 },
+        { "adapter_id": "farmacias_gdl_mx", "priority": 4 },
+        { "adapter_id": "openfoodfacts", "priority": 5, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 9 },
+        { "adapter_id": "google_maps", "priority": 10 }
+      ]
+    },
+    "BR": {
+      "name": "Brazil",
+      "google_tier": "primary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "anvisa_br", "priority": 3 },
+        { "adapter_id": "drogasil_br", "priority": 4 },
+        { "adapter_id": "openfoodfacts", "priority": 5, "categories": ["food"] },
+        { "adapter_id": "google_lens", "priority": 9 },
+        { "adapter_id": "google_maps", "priority": 10 }
+      ]
+    },
+    "SA": {
+      "name": "Saudi Arabia",
+      "google_tier": "secondary",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "sfda_sa", "priority": 3 },
+        { "adapter_id": "nahdi_sa", "priority": 4 },
+        { "adapter_id": "google_lens", "priority": 10 },
+        { "adapter_id": "google_maps", "priority": 11 }
+      ]
+    }
+  },
+  "regions": {
+    "CN-XZ": {
+      "name": "Tibet Autonomous Region",
+      "parent_country": "CN",
+      "google_tier": "avoid",
+      "notes": "Use China adapters + offline pack; Google unreliable",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "offline_tibet_pack", "priority": 2 },
+        { "adapter_id": "equidrug_wiki", "priority": 3 },
+        { "adapter_id": "jd_cn", "priority": 4 },
+        { "adapter_id": "baidu_cn_xz", "priority": 5 },
+        { "adapter_id": "osm_overpass", "priority": 6 },
+        { "adapter_id": "google_lens", "priority": 99, "notes": "Do not use" }
+      ]
+    },
+    "EU": {
+      "name": "European Union (generic)",
+      "google_tier": "primary",
+      "notes": "Fallback when specific EU country not seeded; prefer country row",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "ema_eu", "priority": 3 },
+        { "adapter_id": "openfoodfacts", "priority": 4, "categories": ["food"] },
+        { "adapter_id": "osm_overpass", "priority": 6 },
+        { "adapter_id": "google_lens", "priority": 9 },
+        { "adapter_id": "google_maps", "priority": 10 }
+      ]
+    },
+    "DEFAULT": {
+      "name": "Global fallback",
+      "google_tier": "secondary",
+      "notes": "Any country without explicit config",
+      "sources": [
+        { "adapter_id": "equidrug_curated", "priority": 1 },
+        { "adapter_id": "equidrug_wiki", "priority": 2 },
+        { "adapter_id": "openfoodfacts", "priority": 3, "categories": ["food"] },
+        { "adapter_id": "osm_overpass", "priority": 4 },
+        { "adapter_id": "google_lens", "priority": 15 },
+        { "adapter_id": "google_maps", "priority": 16 }
+      ]
+    }
+  }
+}

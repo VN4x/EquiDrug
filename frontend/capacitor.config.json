@@ -1,0 +1,8 @@
+{
+	"appId": "app.equidrug.mobile",
+	"appName": "EquiDrug",
+	"webDir": "build",
+	"server": {
+		"androidScheme": "https"
+	}
+}

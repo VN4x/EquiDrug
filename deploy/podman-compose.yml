@@ -1,0 +1,72 @@
+# EquiDrug — Podman rootful stack
+# Ports: API 16125, Web 16126, Postgres 16127 (non-standard by design)
+
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine
+    container_name: equidrug-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-equidrug}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-equidrug}
+    ports:
+      - "16127:5432"
+    volumes:
+      - equidrug_pgdata:/var/lib/postgresql/data
+      - ../backend/migrations/001_initial.sql:/docker-entrypoint-initdb.d/01_initial.sql:Z
+      - ../backend/migrations/002_seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:Z
+      - ../backend/migrations/003_seed_locker.sql:/docker-entrypoint-initdb.d/03_seed_locker.sql:Z
+      - ../backend/migrations/004_diet_macros.sql:/docker-entrypoint-initdb.d/04_diet_macros.sql:Z
+      - ../backend/migrations/005_seed_diet.sql:/docker-entrypoint-initdb.d/05_seed_diet.sql:Z
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U equidrug"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: equidrug-api
+    environment:
+      API_PORT: "16125"
+      API_HOST: 0.0.0.0
+      DATABASE_URL: postgres://${POSTGRES_USER:-equidrug}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-equidrug}?sslmode=disable
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:16126,https://equidrug.local}
+    ports:
+      - "16125:16125"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:16125}
+    container_name: equidrug-web
+    ports:
+      - "16126:80"
+    depends_on:
+      - api
+
+  caddy:
+    image: docker.io/library/caddy:2-alpine
+    container_name: equidrug-caddy
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:Z
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+volumes:
+  equidrug_pgdata:
+  caddy_data:
+  caddy_config:

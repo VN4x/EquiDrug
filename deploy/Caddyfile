@@ -1,0 +1,31 @@
+# Replace equidrug.example with your Tailscale MagicDNS name or public domain.
+# Caddy terminates TLS; API and PWA are reverse-proxied on standard 443.
+
+{
+	email admin@equidrug.example
+}
+
+equidrug.example {
+	encode gzip zstd
+
+	handle /api/* {
+		reverse_proxy api:16125
+	}
+
+	handle /health {
+		reverse_proxy api:16125
+	}
+
+	handle {
+		reverse_proxy web:80
+	}
+}
+
+# Local dev without TLS:
+:16126 {
+	reverse_proxy web:80
+}
+
+:16125 {
+	reverse_proxy api:16125
+}
